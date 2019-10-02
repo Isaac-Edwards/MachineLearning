@@ -36,7 +36,7 @@ def main():
   plotter = Plotter(X, Y)
 
   w1,b1 = model.getWeight(), model.getBias()
-  y1  = w1*x1 + b1
+  y1  = w1*x_model + b1
   plotter.plot_fit(x_model, y1)
 
   losses = model.linear_regression(X, Y)
@@ -44,7 +44,7 @@ def main():
   plotter.plot_loss(losses)
 
   wf,bf = model.getWeight(), model.getBias()
-  yf = wf*x1+bf
+  yf = wf*x_model+bf
   plotter.plot_fit(x_model, yf)
 
   plotter.show()
