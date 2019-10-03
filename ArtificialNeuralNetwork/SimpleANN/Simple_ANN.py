@@ -25,13 +25,14 @@ Y_test = torch.LongTensor(Y_test)
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
-epochs = 200
+epochs = 100
 losses = []
 
 for i in range(epochs):
   y_pred = model.forward(X_train)
   loss = criterion(y_pred, Y_train)
   losses.append(loss)
+
   optimizer.zero_grad()
   loss.backward()
   optimizer.step()
