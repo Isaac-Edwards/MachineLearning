@@ -5,30 +5,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import time
 from tabular_model import TabularModel
+from haversine_formula import Haversine
 
 df = pd.read_csv('~/MachineLearning/UdemyData/NYCTaxiFares.csv')
 
 # Feature Engineering
-
-def haversine_distance(df, lat1, long1, lat2, long2):
-    """
-    Calculates the haversine distance between 2 sets of GPS coordinates in df
-    """
-    r = 6371  # average radius of Earth in kilometers
-
-    phi1 = np.radians(df[lat1])
-    phi2 = np.radians(df[lat2])
-
-    delta_phi = np.radians(df[lat2]-df[lat1])
-    delta_lambda = np.radians(df[long2]-df[long1])
-
-    a = np.sin(delta_phi/2)**2 + np.cos(phi1) * np.cos(phi2) * np.sin(delta_lambda/2)**2
-    c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1-a))
-    d = (r * c) # in kilometers
-
-    return d
-
-df['dist_km'] = haversine_distance(df, 'pickup_latitude', 'pickup_longitude', 'dropoff_latitude', 'dropoff_longitude')
+df['dist_km'] = Haversine.distance(df, 'pickup_latitude', 'pickup_longitude', 'dropoff_latitude', 'dropoff_longitude')
 df['EDTdate'] = pd.to_datetime(df['pickup_datetime'].str[:19]) - pd.Timedelta(hours=4)
 df['Hour'] = df['EDTdate'].dt.hour
 df['AMorPM'] = np.where(df['Hour']<12,'am','pm')
