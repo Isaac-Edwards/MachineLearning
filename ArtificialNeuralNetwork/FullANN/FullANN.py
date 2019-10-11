@@ -10,7 +10,9 @@ from haversine_formula import Haversine
 df = pd.read_csv('~/MachineLearning/UdemyData/NYCTaxiFares.csv')
 
 # Feature Engineering
-df['dist_km'] = Haversine.distance(df, 'pickup_latitude', 'pickup_longitude', 'dropoff_latitude', 'dropoff_longitude')
+pickup_coord_labels = ['pickup_latitude', 'pickup_longitude']
+dropoff_coord_labels = ['dropoff_latitude', 'dropoff_longitude']
+df['dist_km'] = Haversine.distance(df, pickup_coord_labels, dropoff_coord_labels)
 df['EDTdate'] = pd.to_datetime(df['pickup_datetime'].str[:19]) - pd.Timedelta(hours=4)
 df['Hour'] = df['EDTdate'].dt.hour
 df['AMorPM'] = np.where(df['Hour']<12,'am','pm')
