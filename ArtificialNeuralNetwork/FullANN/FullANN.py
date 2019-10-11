@@ -13,8 +13,7 @@ feature_engineer = FeatureEngineer(df)
 feature_engineer.convert_coordinates_to_distance_travelled()
 feature_engineer.convert_datetime_to_useful_time_info()
 
-print(df.head())
-
+# divide into categorisation and continuous data
 cat_cols = ['Hour', 'AMorPM', 'Weekday']
 cont_cols = ['pickup_latitude', 'pickup_longitude', 'dropoff_latitude', 'dropoff_longitude', 'passenger_count', 'dist_km']
 y_col = ['fare_amount']
@@ -29,18 +28,11 @@ conts = np.stack([df[col].values for col in cont_cols], 1)
 conts = torch.tensor(conts, dtype=torch.float)
 y = torch.tensor(df[y_col].values, dtype=torch.float).reshape(-1,1)
 
-# The rule of thumb for determining the embedding size is to divide the number of unique entries in each column by 2, but not to exceed 50.
+# embedding sizes
 cat_szs = [len(df[col].cat.categories) for col in cat_cols]
-emb_szs = [(size, min(50, (size+1)//2)) for size in cat_szs]
+emb_szs = [(size, min(50, (size+1)//2)) for size in cat_szs] # The rule of thumb for determining the embedding size is to divide the number of unique entries in each column by 2, but not to exceed 50.
 
-selfembeds = nn.ModuleList([nn.Embedding(ni, nf) for ni,nf in emb_szs])
-
-torch.manual_seed(33)
-model = TabularModel(emb_szs, conts.shape[1], 1, [200,100], p=0.4)
-
-criterion = nn.MSELoss()  # we'll convert this to RMSE later
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-
+# separate data into training and test data
 batch_size = 60000
 test_size = int(batch_size*0.2)
 
@@ -51,6 +43,14 @@ con_test = conts[batch_size-test_size:batch_size]
 y_train = y[:batch_size-test_size]
 y_test = y[batch_size-test_size:batch_size]
 
+# Neural Networky stuff
+selfembeds = nn.ModuleList([nn.Embedding(ni, nf) for ni,nf in emb_szs])
+
+torch.manual_seed(33)
+model = TabularModel(emb_szs, conts.shape[1], 1, [200,100], p=0.4)
+
+criterion = nn.MSELoss()  # we'll convert this to RMSE later
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 start_time = time.time()
 
@@ -71,6 +71,7 @@ for i in range(epochs):
     loss.backward()
     optimizer.step()
 
+# graphy stuff
 print(f'epoch: {i:3}  loss: {loss.item():10.8f}') # print the last line
 print(f'\nDuration: {time.time() - start_time:.0f} seconds') # print the time elapsed
 
