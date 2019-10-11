@@ -5,18 +5,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import time
 from tabular_model import TabularModel
-from haversine_formula import Haversine
+from feature_engineer import FeatureEngineer
 
 df = pd.read_csv('~/MachineLearning/UdemyData/NYCTaxiFares.csv')
 
-# Feature Engineering
-pickup_coord_labels = ['pickup_latitude', 'pickup_longitude']
-dropoff_coord_labels = ['dropoff_latitude', 'dropoff_longitude']
-df['dist_km'] = Haversine.distance(df, pickup_coord_labels, dropoff_coord_labels)
-df['EDTdate'] = pd.to_datetime(df['pickup_datetime'].str[:19]) - pd.Timedelta(hours=4)
-df['Hour'] = df['EDTdate'].dt.hour
-df['AMorPM'] = np.where(df['Hour']<12,'am','pm')
-df['Weekday'] = df['EDTdate'].dt.strftime("%a")
+feature_engineer = FeatureEngineer(df)
+feature_engineer.convert_coordinates_to_distance_travelled()
+feature_engineer.convert_datetime_to_useful_time_info()
+
+print(df.head())
 
 cat_cols = ['Hour', 'AMorPM', 'Weekday']
 cont_cols = ['pickup_latitude', 'pickup_longitude', 'dropoff_latitude', 'dropoff_longitude', 'passenger_count', 'dist_km']
